@@ -57,8 +57,9 @@ impl P25Channel {
         let mut power_sum = 0.0_f32;
         let mut power_count = 0_usize;
 
-        for pair in bytes.chunks_exact(2) {
-            let sample = cu8_pair(pair[0], pair[1]);
+        let (pairs, _) = bytes.as_chunks::<2>();
+        for &[i, q] in pairs {
+            let sample = cu8_pair(i, q);
             let Some(decimated) = self.decimator.feed(sample) else {
                 continue;
             };

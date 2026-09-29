@@ -931,10 +931,8 @@ async fn coordinate(
                         call.traffic_talkgroup_id = grant.traffic_talkgroup_id;
                         call_updated = call.source_unit != original_source
                             || call.traffic_talkgroup_id != original_traffic_talkgroup;
-                        if call_updated {
-                            if let Some(archive) = &archive {
-                                let _ = archive.send(ArchiveEvent::CallUpdated(call.clone()));
-                            }
+                        if call_updated && let Some(archive) = &archive {
+                            let _ = archive.send(ArchiveEvent::CallUpdated(call.clone()));
                         }
                     }
                     if call_updated {
