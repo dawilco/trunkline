@@ -1,0 +1,19 @@
+[package]
+name = "imbe-vocoder"
+version.workspace = true
+edition = "2015"
+license = "MIT"
+description = "Pure-Rust P25 Phase I IMBE voice decoder, modernized for Trunkline"
+publish = false
+
+[lib]
+name = "imbe"
+
+[dependencies]
+arrayvec = "0.7.6"
+collect_slice = "1.2.0"
+crossbeam = "0.8.4"
+iq_osc = "3.0.0"
+num = "0.1.43"
+rand = "0.3.23"
+slice_mip = "1.0.0"

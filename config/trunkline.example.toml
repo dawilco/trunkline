@@ -1,0 +1,271 @@
+# Trunkline receiver configuration.
+#
+# Copy this file to config/trunkline.toml and edit it for your system. Every
+# value below is documented; the defaults describe a real P25 Phase 1 site
+# (Palmetto 800, Greenville County, South Carolina) so you can see what a
+# working configuration looks like.
+#
+# Find your own system on RadioReference (https://www.radioreference.com):
+# the system page lists the site's control channels, RFSS/site numbers and
+# NAC; the talkgroup table gives the decimal TGIDs used below.
+
+[server]
+# Address the HTTP/WebSocket server listens on.
+bind = "0.0.0.0:8097"
+# Directory containing index.html, app.js, styles.css and audio-worklet.js.
+# The Docker image ships them at /app/web; use "web" for `cargo run`.
+web_root = "/app/web"
+
+[site]
+# Free-form labels shown in the dashboard.
+system = "Palmetto 800"
+name = "Greenville County Simulcast"
+# RF subsystem and site identifiers, as published for the site.
+rfss = 2
+site = 23
+# Network Access Code. Frames carrying a different NAC are ignored, which is
+# what keeps a simulcast receiver from chasing a neighbouring site.
+nac = 475 # 0x1DB
+# "cqpsk" for simulcast (LSM) sites, "c4fm" for conventional trunked sites.
+modulation = "cqpsk"
+# All control channels the site can use. Trunkline hunts through this list
+# until it locks, and rotates to the next one if the control channel moves.
+control_frequencies_hz = [
+  853862500,
+  853262500,
+  853537500,
+  853750000,
+]
+
+[radio]
+# RTL-SDR device indices as reported by `trunkline probe`. Two tuners are
+# required: one stays parked on the control channel, the other follows voice.
+control_device = 0
+voice_device = 1
+# Only 240 kS/s is supported by the current decimation chain.
+sample_rate_hz = 240000
+# Crystal correction in parts per million. Leave at 0 for TCXO dongles.
+ppm = 0
+# Manual tuner gain in dB. Remove this line for automatic gain control.
+gain_db = 38.6
+# Follow clear (unencrypted) group calls whose talkgroup is not listed below.
+# Discovered talkgroups are labelled "TGID <id>" with service "other" and run
+# at `unlisted_priority`, so every configured talkgroup always preempts them.
+monitor_unlisted = true
+unlisted_priority = 0
+
+[archive]
+# Save every followed call as an 8 kHz mono WAV plus a JSON sidecar under
+# <directory>/YYYY/MM/DD/. Nothing is deleted automatically.
+enabled = true
+directory = "/data/transmissions"
+
+[transcription]
+# Transcribe archived calls locally with whisper.cpp. Audio never leaves the
+# receiver. Disable this on machines without a few spare CPU cores.
+enabled = true
+model_path = "/models/ggml-medium.en-q5_0.bin"
+model_name = "whisper-medium.en-q5_0"
+language = "en"
+threads = 6
+# Calls shorter than this are archived but not transcribed.
+minimum_audio_ms = 750
+# Domain hint for the recogniser. Mention your region and agencies; it
+# noticeably improves street and unit names.
+initial_prompt = "Palmetto 800 radio traffic in Greenville County, South Carolina. Traffic may include police, sheriff, fire, EMS, mutual aid, public works, transportation, utilities, schools, hospitals, security, and emergency operations. Transcribe exactly, preserving unit numbers, street names, ten-codes, and dispatch terminology."
+
+# ---------------------------------------------------------------------------
+# Talkgroups
+#
+#   id          decimal TGID from RadioReference
+#   name        label shown in the dashboard and stored with each recording
+#   description optional one-line blurb for the dashboard card
+#   service     police | fire | ems | other  (drives colours and icons)
+#   priority    0-255; the highest-priority clear call wins the voice tuner
+#   enabled     false keeps a talkgroup listed but never followed, even when
+#               monitor_unlisted is true
+#
+# When a site patches talkgroups together (Motorola ASTRO 25 supergroups), a
+# configured talkgroup is still followed while it is a patch member.
+# ---------------------------------------------------------------------------
+
+[[talkgroups]]
+id = 44455
+name = "Travelers Rest Police"
+description = "Primary law enforcement dispatch"
+service = "police"
+priority = 100
+
+[[talkgroups]]
+id = 44458
+name = "Travelers Rest Fire"
+description = "Fire and emergency response"
+service = "fire"
+priority = 90
+
+[[talkgroups]]
+id = 44456
+name = "Travelers Rest Police Ch. 2"
+description = "Secondary police operations"
+service = "police"
+priority = 80
+
+# County-wide dispatch channels. They stay below the local targets above, so
+# local traffic always preempts.
+[[talkgroups]]
+id = 44003
+name = "Greenville Sheriff West Dispatch"
+service = "police"
+priority = 40
+
+[[talkgroups]]
+id = 44358
+name = "Greenville City Police Dispatch"
+service = "police"
+priority = 30
+
+[[talkgroups]]
+id = 44065
+name = "Greenville County EMS Dispatch"
+service = "ems"
+priority = 20
+
+[[talkgroups]]
+id = 44351
+name = "Greenville Fire Dispatch"
+service = "fire"
+priority = 10
+
+# Labels for other traffic observed on this site. Priority 1 keeps them one
+# step above fully unknown talkgroups and below every dispatch target.
+[[talkgroups]]
+id = 27871
+name = "SC National Guard Ch. 5 Operations"
+service = "other"
+priority = 1
+
+[[talkgroups]]
+id = 41023
+name = "Anderson Municipal Police Ch. 1"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 44001
+name = "Greenville Sheriff Traffic/Admin"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 44002
+name = "Greenville Sheriff East Dispatch"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 44004
+name = "Greenville Sheriff South Dispatch"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 44021
+name = "Greenville County Event 1"
+service = "other"
+priority = 1
+
+[[talkgroups]]
+id = 44033
+name = "Greenville County Central 1"
+service = "other"
+priority = 1
+
+[[talkgroups]]
+id = 44043
+name = "Greenville County Fire Ops 10"
+service = "fire"
+priority = 1
+
+[[talkgroups]]
+id = 44157
+name = "Greenlink Greenville Buses"
+service = "other"
+priority = 1
+
+[[talkgroups]]
+id = 44241
+name = "Furman University Police"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 44337
+name = "Fountain Inn Police Dispatch"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 44356
+name = "Greenville City Police Traffic"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 44381
+name = "Greer Police Dispatch"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 44395
+name = "Mauldin Police Dispatch"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 44441
+name = "Simpsonville Police Ch. 1"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 45501
+name = "Laurens County Sheriff Dispatch"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 45541
+name = "Laurens County Fire Dispatch"
+service = "fire"
+priority = 1
+
+[[talkgroups]]
+id = 48571
+name = "Spartanburg EMS Page"
+service = "ems"
+priority = 1
+
+[[talkgroups]]
+id = 50201
+name = "SCHP Newberry/Laurens Dispatch"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 50211
+name = "SCHP Anderson Dispatch"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 50213
+name = "SCHP Greenville Dispatch"
+service = "police"
+priority = 1
+
+[[talkgroups]]
+id = 50215
+name = "SCHP Spartanburg Dispatch"
+service = "police"
+priority = 1

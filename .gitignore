@@ -1,0 +1,8 @@
+/target/
+/data/
+/models/
+/config/trunkline.toml
+*.sigmf-data
+!/fixtures/*.sigmf-data
+.DS_Store
+.env

@@ -1,0 +1,10 @@
+[package]
+name = "static_fir"
+version = "0.2.0"
+edition = "2021"
+license = "MIT"
+description = "FIR filter with static coefficients; stable-Rust compatibility patch"
+publish = false
+
+[lib]
+name = "static_fir"

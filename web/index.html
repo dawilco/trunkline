@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#090c12">
+    <meta
+      name="description"
+      content="Trunkline live P25 trunked radio receiver: control-channel status, priority talkgroup scanning, live audio, and archived transcripts."
+    >
+    <title>Trunkline — Live P25 Receiver</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Trunkline dashboard">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" role="img">
+            <path d="M8 21a11.3 11.3 0 0 1 0-10M12 18a6.8 6.8 0 0 1 0-4M24 11a11.3 11.3 0 0 1 0 10M20 14a6.8 6.8 0 0 1 0 4"></path>
+            <circle cx="16" cy="16" r="2.5"></circle>
+          </svg>
+        </span>
+        <span>
+          <strong>Trunkline</strong>
+          <small id="brandSubtitle">P25 trunked receiver</small>
+        </span>
+      </a>
+
+      <div class="topbar-actions">
+        <span class="connection-pill" id="eventStatus">
+          <span class="status-dot"></span>
+          <span>Connecting</span>
+        </span>
+        <button class="icon-button" id="reconnectButton" type="button" title="Reconnect receiver feeds" aria-label="Reconnect receiver feeds">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 7v5h-5M4 17v-5h5M6.1 9a7 7 0 0 1 11.6-2.6L20 9M4 15l2.3 2.6A7 7 0 0 0 17.9 15"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-heading">
+        <div>
+          <div class="eyebrow" id="siteEyebrow">P25 Phase 1</div>
+          <h1>Receiver dashboard</h1>
+          <p id="siteSummary">Priority-scanned talkgroups with live audio and on-device archiving.</p>
+        </div>
+        <div class="heading-meta">
+          <span id="localTime">--:--:--</span>
+          <small>Local time</small>
+        </div>
+      </section>
+
+      <section class="overview-grid" aria-label="Receiver overview">
+        <article class="card now-playing" id="nowPlayingCard">
+          <div class="card-heading">
+            <div>
+              <span class="section-label">Now receiving</span>
+              <span class="live-badge is-idle" id="callStatus">
+                <span></span>
+                Standby
+              </span>
+            </div>
+            <div class="signal-bars" id="signalBars" aria-label="No active signal">
+              <i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+
+          <div class="call-main">
+            <div class="service-icon police" id="activeServiceIcon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3l7 3v5c0 4.7-2.8 8.1-7 10-4.2-1.9-7-5.3-7-10V6l7-3z"></path>
+                <path d="M9 11.5l2 2 4-4"></path>
+              </svg>
+            </div>
+            <div class="call-title">
+              <h2 id="activeTalkgroup">Waiting for radio traffic</h2>
+              <p id="activeTalkgroupMeta">Configured talkgroups are being monitored.</p>
+            </div>
+          </div>
+
+          <div class="call-facts">
+            <div>
+              <span>Frequency</span>
+              <strong id="activeFrequency">—</strong>
+            </div>
+            <div>
+              <span>Source unit</span>
+              <strong id="activeSource">—</strong>
+            </div>
+            <div>
+              <span>Call duration</span>
+              <strong id="activeDuration">—</strong>
+            </div>
+          </div>
+
+          <div class="player">
+            <button class="listen-button" id="listenButton" type="button">
+              <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5l11 7-11 7V5z"></path>
+              </svg>
+              <svg class="stop-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+              </svg>
+              <span>Listen live</span>
+            </button>
+            <button class="mute-button" id="muteButton" type="button" disabled aria-pressed="false" aria-label="Mute live audio">
+              <svg class="volume-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 5L6.5 9H3v6h3.5l4.5 4V5zM15 9a4 4 0 0 1 0 6M17.5 6.5a8 8 0 0 1 0 11"></path>
+              </svg>
+              <svg class="muted-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 5L6.5 9H3v6h3.5l4.5 4V5zM15 10l5 5M20 10l-5 5"></path>
+              </svg>
+            </button>
+            <div class="audio-state">
+              <span class="mini-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+              <span id="audioStatus">Audio is off</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card system-card">
+          <div class="card-heading">
+            <div>
+              <span class="section-label">Receiver status</span>
+              <span class="mode-badge" id="receiverMode">Starting</span>
+            </div>
+          </div>
+
+          <dl class="status-list">
+            <div>
+              <dt>System</dt>
+              <dd id="systemName">—</dd>
+            </div>
+            <div>
+              <dt>Site</dt>
+              <dd id="siteName">—</dd>
+            </div>
+            <div>
+              <dt>Control channel</dt>
+              <dd>
+                <span id="controlFrequency">—</span>
+                <span class="lock-state" id="controlLock">Searching</span>
+              </dd>
+            </div>
+            <div>
+              <dt>Receiver uptime</dt>
+              <dd id="receiverUptime">—</dd>
+            </div>
+          </dl>
+
+          <div class="health-metrics">
+            <div>
+              <span>Frames decoded</span>
+              <strong id="framesDecoded">0</strong>
+            </div>
+            <div>
+              <span>CRC errors</span>
+              <strong id="crcErrors">0</strong>
+            </div>
+          </div>
+          <p class="last-error" id="lastError" hidden></p>
+        </article>
+      </section>
+
+      <section class="section-block" aria-labelledby="talkgroupsHeading">
+        <div class="section-heading">
+          <div>
+            <span class="section-label">Priority scan list</span>
+            <h2 id="talkgroupsHeading">Configured talkgroups</h2>
+          </div>
+          <div class="scan-heading-status">
+            <span class="subtle-badge" id="talkgroupCount">Loading</span>
+            <span
+              class="sitewide-badge"
+              id="sitewideCoverage"
+              title="All other clear talkgroups carried by this site are followed at background priority"
+              hidden
+            >
+              <i></i>
+              <span id="sitewideCoverageLabel">All other clear talkgroups · Background</span>
+            </span>
+          </div>
+        </div>
+        <p class="scan-description" id="scanDescription">
+          The highest-priority clear call always wins the voice tuner. Every followed call is
+          recorded and transcribed on this device.
+        </p>
+
+        <div class="talkgroup-grid" id="talkgroupGrid">
+          <div class="archive-state">
+            <span class="archive-spinner" aria-hidden="true"></span>
+            <strong>Loading configuration</strong>
+            <small>Fetching the talkgroup list from the receiver…</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="lower-grid">
+        <article class="card devices-card">
+          <div class="section-heading compact">
+            <div>
+              <span class="section-label">Hardware</span>
+              <h2>Receiver devices</h2>
+            </div>
+          </div>
+          <div class="device-list" id="deviceList">
+            <div class="device-row skeleton-row">
+              <span class="device-light"></span>
+              <div><strong>Waiting for device state</strong><small>Receiver connection pending</small></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card activity-card">
+          <div class="section-heading compact">
+            <div>
+              <span class="section-label">Live feed</span>
+              <h2>Recent activity</h2>
+            </div>
+            <button class="text-button" id="clearActivityButton" type="button">Clear</button>
+          </div>
+          <ol class="activity-list" id="activityList" aria-live="polite">
+            <li class="empty-activity">Waiting for receiver events…</li>
+          </ol>
+        </article>
+      </section>
+
+      <section class="section-block archive-section" aria-labelledby="transmissionsHeading">
+        <div class="section-heading archive-heading">
+          <div>
+            <span class="section-label">On-device archive</span>
+            <h2 id="transmissionsHeading">Saved transmissions</h2>
+          </div>
+          <div class="archive-heading-meta">
+            <span class="model-badge" id="archiveModelBadge" title="Local transcription model status">
+              <i></i>
+              <span id="archiveModelName">Local model</span>
+            </span>
+            <span class="subtle-badge" id="transmissionCount">Loading</span>
+          </div>
+        </div>
+        <p class="archive-description">
+          Recent calls with saved receiver audio and local machine-generated transcripts. Calls
+          without saved audio are hidden. Transcripts may contain errors and should be verified
+          against the recording.
+        </p>
+
+        <div class="archive-notice" id="archiveNotice" role="status" hidden></div>
+        <div class="transmission-list" id="transmissionList" aria-live="polite" aria-busy="true">
+          <div class="archive-state">
+            <span class="archive-spinner" aria-hidden="true"></span>
+            <strong>Loading saved transmissions</strong>
+            <small>Checking the local receiver archive…</small>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span id="footerVersion">Trunkline</span>
+      <span>Pure-Rust P25 receiver</span>
+      <span id="lastUpdated">Awaiting first update</span>
+    </footer>
+
+    <noscript>
+      <div class="noscript">JavaScript is required to show live receiver state and play audio.</div>
+    </noscript>
+  </body>
+</html>

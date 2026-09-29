@@ -1,0 +1,11 @@
+.git
+.github
+target
+data
+models
+docs
+tools
+*.sigmf-data
+!fixtures/*.sigmf-data
+.DS_Store
+README.md

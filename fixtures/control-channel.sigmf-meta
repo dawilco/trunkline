@@ -1,0 +1,25 @@
+{
+  "global": {
+    "core:datatype": "cu8",
+    "core:sample_rate": 240000,
+    "core:version": "1.0.0",
+    "core:recorder": "Trunkline 0.1.0",
+    "core:description": "RTL-SDR IQ capture of a P25 Phase 1 control channel (Palmetto 800, Greenville County Simulcast, NAC 0x1DB) used for Trunkline replay regression tests",
+    "core:num_channels": 1
+  },
+  "captures": [
+    {
+      "core:sample_start": 0,
+      "core:frequency": 853862500,
+      "core:datetime": "2026-07-29T18:50:13.452564440+00:00"
+    }
+  ],
+  "annotations": [],
+  "trunkline:provenance": {
+    "device_index": 0,
+    "tuned_frequency_hz": 853862500,
+    "gain_db": 38.6,
+    "ppm": 0,
+    "samples": 1200000
+  }
+}

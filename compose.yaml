@@ -1,0 +1,17 @@
+services:
+  trunkline:
+    build:
+      context: .
+    container_name: trunkline
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "8097:8097"
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+      - ./data:/data
+      - ./models:/models:ro
+      - ./config/trunkline.toml:/app/config/trunkline.toml:ro
+    environment:
+      TRUNKLINE_CONFIG: /app/config/trunkline.toml
+      RUST_LOG: trunkline_server=info,radio_core=info

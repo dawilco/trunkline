@@ -1,0 +1,28 @@
+[package]
+name = "radio-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "RTL-SDR, DSP, P25 trunking, and audio engine for Trunkline"
+publish = false
+
+[features]
+default = ["hardware"]
+hardware = ["dep:rs-rtl"]
+
+[dependencies]
+anyhow.workspace = true
+chrono.workspace = true
+imbe = { package = "imbe-vocoder", path = "../imbe-vocoder" }
+num-complex.workspace = true
+p25 = { package = "p25-protocol", path = "../p25-protocol" }
+p25_filts = { package = "p25-filters", path = "../p25-filters" }
+rs-rtl = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+static_fir = "0.2.0"
+thiserror.workspace = true
+tokio.workspace = true
+toml.workspace = true
+tracing.workspace = true

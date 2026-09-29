@@ -1,0 +1,25 @@
+[package]
+name = "p25-protocol"
+version.workspace = true
+edition = "2015"
+license = "MIT"
+description = "P25 Phase I air-interface decoder, modernized for Trunkline"
+publish = false
+
+[lib]
+name = "p25"
+
+[dependencies]
+binfield_matrix = "0.2.0"
+cai_cyclic = "0.1.2"
+cai_golay = "0.1.1"
+collect_slice = "1.2.0"
+moving_avg = "0.2.0"
+num-traits = "0.2.0"
+static_fir = "0.2.0"
+serde = { version = "0.9.0", optional = true }
+serde_derive = { version = "0.9.0", optional = true }
+
+[features]
+default = []
+ser = ["dep:serde", "dep:serde_derive"]
